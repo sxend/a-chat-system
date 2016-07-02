@@ -1,12 +1,12 @@
 package arimitsu.sf.a_chat_system
 
-import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
+import akka.cluster.Cluster
 
-class ChatSystem {
-  val config = ConfigFactory.load.getConfig("arimitsu.sf.a-chat-system")
-  implicit val system: ActorSystem = ActorSystem(config.getString("system-name"))
-  def login(id: String ): Unit = {
-    // join cluster
+object ChatSystem {
+  def main(args: Array[String]): Unit = {
+    val components = Components
+    import components.system
+    val cluster = Cluster(components.system)
+
   }
 }

@@ -8,20 +8,17 @@
         }
     </style>
 </head>
-<!--
-init socket
--->
-
 <body>
 <ul id="chat-messages">
     <li class="chat-message">admin: welcome!</li>
 </ul>
-<input id="send-message" type="text" name="message" /> <input type="button" value="send" onclick="appendMessage();"/>
+<input id="send-message" type="text" name="message" /> <input id="send-button" type="button" value="send" />
 
 <script>
     (function() {
         var chatMessages = document.body.querySelector("#chat-messages");
         var sendMessage = document.body.querySelector("#send-message");
+        var sendButton = document.body.querySelector("#send-button");
         var template = document.createElement("li");
         template.classList.add("chat-message");
         function appendMessage() {
@@ -34,7 +31,29 @@ init socket
             li.textContent = message;
             chatMessages.appendChild(li);
         }
-        window.appendMessage = appendMessage;
+
+
+        var ws = new WebSocket("ws://localhost:8080/message");
+        ws.onopen = function() {
+        };
+        ws.onerror = function(event) {
+            alert("ws connection failed.");
+        };
+        ws.onclose = function() {
+        };
+        ws.onmessage = function(message) {
+            var li = template.cloneNode();
+            li.textContent = message.data;
+            chatMessages.appendChild(li);
+        };
+        sendButton.onclick = function() {
+            var message = sendMessage.value;
+            if (!message) {
+                return;
+            }
+            ws.send(message);
+            sendMessage.value = "";
+        }
     })();
 
 </script>
