@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>main - chat system</title>
+    <style>
+        .chat-message {
+            list-style: none;
+        }
+    </style>
+</head>
+<!--
+init socket
+-->
+
+<body>
+<ul id="chat-messages">
+    <li class="chat-message">admin: welcome!</li>
+</ul>
+<input id="send-message" type="text" name="message" /> <input type="button" value="send" onclick="appendMessage();"/>
+
+<script>
+    (function() {
+        var chatMessages = document.body.querySelector("#chat-messages");
+        var sendMessage = document.body.querySelector("#send-message");
+        var template = document.createElement("li");
+        template.classList.add("chat-message");
+        function appendMessage() {
+            var message = sendMessage.value;
+            if (!message) {
+                return;
+            }
+            sendMessage.value = "";
+            var li = template.cloneNode();
+            li.textContent = message;
+            chatMessages.appendChild(li);
+        }
+        window.appendMessage = appendMessage;
+    })();
+
+</script>
+</body>
+</html>

@@ -43,6 +43,17 @@ libraryDependencies ++= {
   )
 }
 
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot
+libraryDependencies += ("org.springframework.boot" % "spring-boot-starter-web" % "1.3.5.RELEASE")
+                        .exclude("org.springframework.boot", "spring-boot-starter-tomcat")
+
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jetty
+libraryDependencies += "org.springframework.boot" % "spring-boot-starter-jetty" % "1.3.5.RELEASE"
+
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
+libraryDependencies += "org.springframework.boot" % "spring-boot-starter-websocket" % "1.3.5.RELEASE"
+
+
 publishMavenStyle := false
 
 bintrayRepository := {
