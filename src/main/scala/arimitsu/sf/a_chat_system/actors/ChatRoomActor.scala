@@ -20,7 +20,7 @@ class ChatRoomActor extends PersistentActor {
   override def receiveRecover: Receive = {
     case send: Protocol.Send =>
       this.messages = this.messages :+ (send.name, send.message)
-      context.system.log.info(s"$send")
+      context.system.log.info(s"${self} recover: $send")
   }
 
   var messages: List[(String, String)] = Nil
@@ -34,7 +34,7 @@ class ChatRoomActor extends PersistentActor {
       }
       this.sessions = this.sessions :+ join.session
     case send: Protocol.Send =>
-      persist(send) { ev =>
+      persist(send) { _ =>
         broadcastMessage(s"${send.name}: ${send.message}")
         this.messages = this.messages :+ (send.name, send.message)
       }

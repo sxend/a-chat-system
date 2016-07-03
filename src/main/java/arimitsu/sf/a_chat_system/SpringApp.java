@@ -13,7 +13,6 @@ import javax.annotation.PostConstruct;
 @SpringBootApplication
 public class SpringApp {
     public static void main(String... args) {
-        // TODO connect akka cluster
         SpringApplication.run(SpringApp.class, args);
     }
 
