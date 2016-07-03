@@ -76,12 +76,15 @@ scalacOptions ++= Seq(
 
 assemblyMergeStrategy in assembly := {
   case PathList(ps @ _*) if ps.last endsWith "bnd.bnd" => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith "additional-spring-configuration-metadata.json" => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties" => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith "spring-configuration-metadata.json" => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith "spring.factories" => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith "spring.provides" => MergeStrategy.first
   case x => (assemblyMergeStrategy in assembly).value(x)
 }
 
 testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "html", "console")
-
-testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/ScalaTest-reports/html")
 
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/ScalaTest-reports/unit")
 
