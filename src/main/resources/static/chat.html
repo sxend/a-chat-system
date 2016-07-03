@@ -33,13 +33,15 @@
         }
 
 
-        var ws = new WebSocket("ws://localhost:8080/message");
+        var ws = new WebSocket("ws://localhost:8080/message" + (location.search || "?room=Lounge&name=anonymous"));
         ws.onopen = function() {
+            console.log("ws connection open.");
         };
         ws.onerror = function(event) {
-            alert("ws connection failed.");
+            console.log("ws connection failed.");
         };
         ws.onclose = function() {
+            console.log("ws connection closed.");
         };
         ws.onmessage = function(message) {
             var li = template.cloneNode();

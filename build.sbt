@@ -35,6 +35,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-experimental" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-jackson-experimental" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaVersion,
+    "com.typesafe.akka" %% "akka-persistence-cassandra" % "0.17",
+    "org.iq80.leveldb" % "leveldb" % "0.7",
     "com.chuusai" %% "shapeless" % shapelessVersion,
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "org.specs2" %% "specs2-html" % spec2Version % "test",
