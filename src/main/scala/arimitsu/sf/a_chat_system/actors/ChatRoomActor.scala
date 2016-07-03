@@ -5,7 +5,6 @@ import akka.cluster.sharding.ShardRegion
 import akka.persistence.PersistentActor
 import arimitsu.sf.a_chat_system.WebSocketSessionActor
 import arimitsu.sf.a_chat_system.actors.ChatRoomActor.Protocol
-import org.springframework.web.socket.TextMessage
 
 import scala.concurrent.duration._
 

@@ -2,7 +2,6 @@ package arimitsu.sf.a_chat_system
 
 import akka.actor.{ Actor, ActorRef }
 import org.springframework.web.socket.WebSocketSession
-import akka.pattern._
 
 class WebSocketSessionManager extends Actor {
   import WebSocketSessionManager.Protocol._

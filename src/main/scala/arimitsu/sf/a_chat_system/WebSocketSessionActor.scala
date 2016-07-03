@@ -5,6 +5,7 @@ import org.springframework.web.socket.{ CloseStatus, TextMessage, WebSocketSessi
 
 class WebSocketSessionActor(session: WebSocketSession) extends Actor {
   import WebSocketSessionActor.Protocol._
+
   import scala.collection.JavaConverters._
 
   def receive = {

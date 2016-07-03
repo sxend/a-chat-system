@@ -1,16 +1,16 @@
 package arimitsu.sf.a_chat_system
 
-import akka.actor.{ Actor, ActorRef, Props }
+import akka.actor.ActorRef
+import akka.pattern._
+import akka.util.Timeout
 import arimitsu.sf.a_chat_system.actors.ChatRoomActor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import org.springframework.web.socket.handler.TextWebSocketHandler
 import org.springframework.web.socket._
+import org.springframework.web.socket.handler.TextWebSocketHandler
 
-import scala.language.existentials
-import akka.pattern._
-import akka.util.Timeout
 import scala.concurrent.duration._
+import scala.language.existentials
 
 @Component
 class MessageHandler extends TextWebSocketHandler {
