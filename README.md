@@ -6,8 +6,9 @@ a chat system
 Usage
 ======
 
-1. cassandraを起動する
-    - 環境変数 CASSANDRA_HOST にcassandra のlisten hostを入れる。
+#### cassandraを起動する
+
+* 環境変数 CASSANDRA_HOST にcassandra のlisten hostを入れる。
 
 #### Akka Cluster: seed0,seed1 nodeの起動
 
