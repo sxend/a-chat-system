@@ -3,7 +3,9 @@ package arimitsu.sf.a_chat_system.actors
 import akka.actor.{ ActorRef, Props }
 import akka.cluster.sharding.ShardRegion
 import akka.persistence.PersistentActor
+import arimitsu.sf.a_chat_system.WebSocketSessionActor
 import arimitsu.sf.a_chat_system.actors.ChatRoomActor.Protocol
+import org.springframework.web.socket.TextMessage
 
 import scala.concurrent.duration._
 
@@ -30,7 +32,7 @@ class ChatRoomActor extends PersistentActor {
     case join: Protocol.Join =>
       broadcastMessage(s"join -> ${join.name}")
       this.messages.foreach { message =>
-        join.session ! s"${message._1}: ${message._2}"
+        join.session ! WebSocketSessionActor.Protocol.SendMessage(s"${message._1}: ${message._2}")
       }
       this.sessions = this.sessions :+ join.session
     case send: Protocol.Send =>
@@ -38,9 +40,11 @@ class ChatRoomActor extends PersistentActor {
         broadcastMessage(s"${send.name}: ${send.message}")
         this.messages = this.messages :+ (send.name, send.message)
       }
+    case leave: Protocol.Leave =>
+      this.sessions = this.sessions.filterNot(_ == leave.session)
   }
   private def broadcastMessage(message: String): Unit = {
-    this.sessions.foreach(_ ! message)
+    this.sessions.foreach(_ ! WebSocketSessionActor.Protocol.SendMessage(message))
   }
 }
 
@@ -49,17 +53,20 @@ object ChatRoomActor extends ShardingSupport {
   object Protocol {
     case class Join(room: String, name: String, session: ActorRef)
     case class Send(room: String, name: String, message: String)
+    case class Leave(room: String, session: ActorRef)
   }
 
   override val shardingName: String = "chat-room"
   override val props: Props = Props[ChatRoomActor]
 
   override val extractEntityId: ShardRegion.ExtractEntityId = {
-    case send: Protocol.Send => (send.room, send)
-    case join: Protocol.Join => (join.room, join)
+    case send: Protocol.Send   => (send.room, send)
+    case join: Protocol.Join   => (join.room, join)
+    case leave: Protocol.Leave => (leave.room, leave)
   }
   override val extractShardId: ShardRegion.ExtractShardId = {
-    case send: Protocol.Send => send.room
-    case join: Protocol.Join => join.room
+    case send: Protocol.Send   => send.room
+    case join: Protocol.Join   => join.room
+    case leave: Protocol.Leave => leave.room
   }
 }
