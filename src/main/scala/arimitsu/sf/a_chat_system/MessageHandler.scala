@@ -1,6 +1,7 @@
 package arimitsu.sf.a_chat_system
 
-import akka.actor.ActorRef
+import akka.actor.{ ActorRef, Props }
+import akka.cluster.pubsub.{ DistributedPubSub, DistributedPubSubMediator }
 import akka.pattern._
 import akka.util.Timeout
 import arimitsu.sf.a_chat_system.actors.ChatRoomActor
@@ -23,27 +24,37 @@ class MessageHandler extends TextWebSocketHandler {
 
   private lazy val room = ChatSystem.getShardRegion(ChatRoomActor.shardingName, components.system)
 
-  private lazy val manager: ActorRef = components.webSocketSessionManager(components.system)
+  private lazy val mediator = DistributedPubSub(components.system).mediator
 
   override def afterConnectionEstablished(session: WebSocketSession) {
+    super.afterConnectionEstablished(session)
     val params = parseParams(session)
-    manager.ask(WebSocketSessionManager.Protocol.Get(session)).mapTo[ActorRef].onSuccess {
-      case handler =>
-        room ! ChatRoomActor.Protocol.Join(params("room"), params("name"), handler)
-    }
+    val handler = components.system.actorOf(Props(classOf[WebSocketSessionActor], session))
+    val sessionProtocol = ChatRoomActor.Protocol.Session(session.getId, handler)
+    room ! ChatRoomActor.Protocol.Join(params("room"), params("name"), sessionProtocol)
   }
 
   override protected def handleTextMessage(session: WebSocketSession, message: TextMessage) {
+    super.handleTextMessage(session, message)
     val params = parseParams(session)
-    room ! ChatRoomActor.Protocol.Send(params("room"), params("name"), new String(message.asBytes()))
+    val messageProtocol = ChatRoomActor.Protocol.Message(params("name"), new String(message.asBytes()))
+    room ! ChatRoomActor.Protocol.Send(params("room"), messageProtocol)
   }
 
   override def afterConnectionClosed(session: WebSocketSession, status: CloseStatus): Unit = {
-    val params = parseParams(session)
-    manager.ask(WebSocketSessionManager.Protocol.Remove(session)).mapTo[ActorRef].onSuccess {
-      case handler =>
-        room ! ChatRoomActor.Protocol.Leave(params("room"), handler)
-    }
+    super.afterConnectionClosed(session, status)
+    publishCloseMessage(session)
+  }
+
+  override def handleTransportError(session: WebSocketSession, exception: Throwable): Unit = {
+    super.handleTransportError(session, exception)
+    publishCloseMessage(session)
+  }
+
+  private def publishCloseMessage(session: WebSocketSession): Unit = {
+    val close = DistributedPubSubMediator.Publish(s"session-close-${session.getId}", WebSocketSessionActor.Event.Close(session.getId))
+    components.system.log.info(s"send session close publish: $close")
+    mediator ! close
   }
 
   private def parseParams(session: WebSocketSession) = {

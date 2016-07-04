@@ -7,12 +7,10 @@ import org.springframework.stereotype.Component
 trait Components {
   val config: Config
   implicit val system: ActorSystem
-  val webSocketSessionManager: (ActorRefFactory) => ActorRef
 }
 
 @Component
 object Components extends Components {
   override val config: Config = ConfigFactory.load.getConfig("arimitsu.sf.a-chat-system")
   override implicit val system: ActorSystem = ActorSystem(config.getString("system-name"), ConfigFactory.load.withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port = 9000")))
-  override val webSocketSessionManager = (context: ActorRefFactory) => context.actorOf(Props(classOf[WebSocketSessionManager]))
 }
